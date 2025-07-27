@@ -105,69 +105,27 @@ a. Create Hour, Day, Month, Weekday
  Encode Peak vs Off-Peak
 
 ```python
-import pandas as pd
-from datetime import datetime
+# Convert pickup_datetime to datetime if not already
+df_cleaned['pickup_datetime'] = pd.to_datetime(df_cleaned['pickup_datetime'])
 
-# Define paths
-path = "/content/drive/MyDrive/big_data/"
+# Extract hour
+df_cleaned['hour'] = df_cleaned['pickup_datetime'].dt.hour
 
-# Load cleaned dataset
-df = pd.read_csv(path + "uber_fares_cleaned.csv")
-print(f"Dataset shape: {df.shape}")
+# Average fare by hour of day
+hourly_fare = df_cleaned.groupby('hour')['fare_amount'].mean()
 
-# Feature Engineering
-print("\nCreating new features...")
+# Line plot
+plt.figure(figsize=(10, 5))
+sns.lineplot(x=hourly_fare.index, y=hourly_fare.values)
+plt.title('Average Fare by Hour of Day')
+plt.xlabel('Hour of Day')
+plt.ylabel('Average Fare Amount ($)')
+plt.xticks(range(0, 24))
+plt.grid(True)
+plt.show()
 
-# 1. DateTime feature engineering
-# Assuming there's a datetime column (adjust column name as needed)
-datetime_columns = []
-for col in df.columns:
-    if 'date' in col.lower() or 'time' in col.lower():
-        try:
-            df[col] = pd.to_datetime(df[col])
-            datetime_columns.append(col)
-            print(f"Found datetime column: {col}")
-        except:
-            continue
-
-# Extract time-based features
-for col in datetime_columns:
-    df[f'{col}_hour'] = df[col].dt.hour
-    df[f'{col}_day'] = df[col].dt.day
-    df[f'{col}_month'] = df[col].dt.month
-    df[f'{col}_dayofweek'] = df[col].dt.dayofweek
-    df[f'{col}_weekend'] = (df[col].dt.dayofweek >= 5).astype(int)
-    
-    # Rush hour indicator (7-9 AM, 5-7 PM)
-    df[f'{col}_rush_hour'] = ((df[f'{col}_hour'].between(7, 9)) | 
-                              (df[f'{col}_hour'].between(17, 19))).astype(int)
-
-# 2. Create categorical features
-if datetime_columns:
-    for col in datetime_columns:
-        # Peak/Off-peak periods
-        df[f'{col}_time_period'] = df[f'{col}_hour'].apply(
-            lambda x: 'Morning' if 6 <= x < 12
-            else 'Afternoon' if 12 <= x < 18
-            else 'Evening' if 18 <= x < 24
-            else 'Night'
-        )
-
-print(f"Enhanced dataset shape: {df.shape}")
-print(f"New columns added: {df.shape[1] - pd.read_csv(path+'uber_fares_cleaned.csv').shape[1]}")
-
-# Save enhanced dataset
-df.to_csv(path + "uber_fares_enhanced.csv", index=False)
-print(f"✅ Enhanced dataset saved as '{path}uber_fares_enhanced.csv'")
-
-# Display new columns
-print(f"\nNew feature columns created:")
-original_cols = pd.read_csv(path + 'uber_fares_cleaned.csv').columns.tolist()
-new_cols = [col for col in df.columns if col not in original_cols]
-for col in new_cols:
-    print(f"  • {col}")
 ```
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/7f10763b-4f3f-4fee-b0f2-dcf3df0eab7f" />
+<img width="842" height="470" alt="image" src="https://github.com/user-attachments/assets/42d4ff89-ed2e-4bd2-be99-9eec0f5bb5fb" />
 
 ### 2.3 Analytical Techniques
 Descriptive Stats: Mean, median, IQR, skewness
