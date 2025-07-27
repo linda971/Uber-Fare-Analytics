@@ -1,6 +1,3 @@
-# Uber-Fare-Analytics
-
-# Uber-Fare-Analytics
 
 # Uber Fares Dataset Analysis: Comprehensive Analytical Report
 
