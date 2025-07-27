@@ -4,6 +4,7 @@
 **Course:** Introduction to Big Data Analytics INSY 8413  
 **Instructor:** Eric Maniraguha  
 **Student:**  Linda Cynthia Mutembe
+
 **Assignment:** Assignment I - Uber Fares Dataset Analysis using Power BI  
 
 ---
